@@ -8,6 +8,7 @@ import numpy as np
 import os
 import math
 import ant
+import csv
 #import random !!!
 
 class environment(object):
@@ -93,18 +94,52 @@ class environment(object):
         for i in range(self.dimensions[2]):
             print(np.matrix(self.env[:,:,i]))
 
-    def loadAnts(self, file):
+    def loadAnts(self, filename='antconfig.csv'):
         """
         Args: 
-            file: file handle to load ants from a file
+            filename: file handle to load ants from a file
         """
+        print('Loading data from ', filename, '.')
+        with open(filename, newline='') as f:
+            reader = csv.reader(f)
+            text = next(reader)
+        x = int(text[0][2:])
+        y = int(text[1][1:])
+        z = int(text[2][1:-1])
 
+
+
+
+        # Read the array from disk
+        new_data = np.loadtxt(filename, delimiter=',')
+        #print (new_data)
+
+        # However, going back to 3D is easy if we know the
+        # original shape of the array
+        self.env = new_data.reshape((x, y, z))
+        print('Data loaded sucessfully from ', filename, '.')
         return;
 
-    def saveAnts(self, file):
+    def saveAnts(self, filename='antconfig.csv'):
         """
         Args: 
-            file: file handle to save ants in a file
+            filename: file handle to save ants in a file
         """
 
+        print('Saving data to ', filename, '.')
+        # Write the array to disk
+        with open(filename, 'w') as outfile:
+            outfile.write('#{0}\n'.format(self.env.shape))
+
+        with open(filename, 'ab') as outfile:
+
+            # Iterating through a ndimensional array produces slices along
+            # the last axis. This is equivalent to data[i,:,:] in this case
+            for data_slice in self.env:
+                np.savetxt(outfile, data_slice, fmt='%d', delimiter=',')
+
+                # Writing out a break to indicate different slices...
+                #outfile.write('# New layer\n')
+
+        print('Data saved sucessfully to ', filename, '.')
         return; 

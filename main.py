@@ -11,6 +11,8 @@ env = environment([10,10,10])
 
 env.setAnts(50, 'cube')
 env.showAnts()
+env.saveAnts()
+env.loadAnts()
 
 
 
