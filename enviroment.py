@@ -2,7 +2,6 @@
 """
 Created on Thu Jan 11 13:18:31 2018
 
-@author: kathi
 """
 
 import numpy as np
@@ -10,38 +9,45 @@ import os
 #import random !!!
 
 class environment(object):
-    ''' class simulating the environment for the ant raft 
     '''
-    int env[][][] #0 if empty, 1 if ant but not attached, 2 ant and attached
-    int numUpdates;
-    #evtl waterlevel;
-           
-    
-    
-    
-    def __init__(dimensions):
+    Class simulating the environment for the ant raft.
+    self.env is a in 3D-array, coding each discrete position in the environment. It contains 0 for free cubes,
+    1 for ants that are moving around and 2 for attached ants.
+    self.numUpdates keeps track of the iterations performed on the environment.
+    '''
+
+
+    def __init__(self, dimensions = [100, 100, 100]):
         """
         Args:
-            dimensions: array with entries: x,y,z
+            dimensions: int array with entries specifying the x, y and z dimensions of the env
         """
+        self.env = np.zeros(dimensions)
+        self.numUpdates = 0
+
         return;
     
     def setAnts(number, config):
         """
         Args: 
-            number: number of ants
-            config: random, circle, cube....
+            number: int, number of ants
+            config: string, specifying the initial configuration of ants: random, circle, cube....
         """
+
         return;
+
     def loadAnts(file):
         """
         Args: 
-            file: load ants of a file
+            file: file handle to load ants from a file
         """
+
         return;
+
     def saveAnts(file):
         """
         Args: 
-            file: save ants in a file
+            file: file handle to save ants in a file
         """
+
         return; 
