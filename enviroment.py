@@ -27,7 +27,7 @@ class environment(object):
 
         return;
     
-    def setAnts(number, config):
+    def setAnts(self, number, config):
         """
         Args: 
             number: int, number of ants
@@ -36,7 +36,7 @@ class environment(object):
 
         return;
 
-    def loadAnts(file):
+    def loadAnts(self, file):
         """
         Args: 
             file: file handle to load ants from a file
@@ -44,7 +44,7 @@ class environment(object):
 
         return;
 
-    def saveAnts(file):
+    def saveAnts(self, file):
         """
         Args: 
             file: file handle to save ants in a file
