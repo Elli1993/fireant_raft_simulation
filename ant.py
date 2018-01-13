@@ -52,7 +52,7 @@ class ant(object):
         index = [0, 1]
         var = [-1, 1]
         friends = 0
-        #print( 'starting pos ', self.position)
+        print( 'starting pos ', self.position)
         if (self.attached):
             if (env[self.position[0], self.position[1], self.position[2] + 1] == 0):
                 for v in var:
@@ -67,9 +67,9 @@ class ant(object):
                     self.position[2] += 1
                     #print('Current position: ', self.position)
                     x = randint(0, 3)
-                    self.moveAnt(x, env)
+                    self.moveAnt(x, env,0.3)
                     self.randomwalk(env)
-        #print('end pos ', self.position)
+        print('end pos ', self.position)
         return;
 
     def getPosition(self):
@@ -102,7 +102,7 @@ class ant(object):
         """ looks in x and y direction. if it finds other ants returns true if not returns false
         """
         var = [-1, 1]
-        print('looking for friends')
+        #print('looking for friends')
         for v in var:
             if (env[self.position[0] + v, self.position[1], self.position[2]] != 0 or env[
                 self.position[0], self.position[1] + v, self.position[2]] != 0):
@@ -122,25 +122,28 @@ class ant(object):
             return False;
         return True;
 
-    def setEdgeDetected(self, env):
+    def checkEdgeDetected(self, env):
         if (env[self.position[0], self.position[1], self.position[2] - 1] == 0):
-            self.edgeDetected = True;
-        else:
-            self.edgeDetected = False;
-        return;
+            return True;
+        return False;
 
-    def moveAnt(self, randNum, env):
+    def moveAnt(self, randNum, env, probability = 1.0):
         """
         moves ant in the direction the randNum indicates, 0:x+1, 1:x-1, 2:y+1, 3: y-1, if position is free
         if doesn't have an ant below -> edgeDetected=True
         """
-        print('movingAnt')
+        print('movingAnt', randNum)
         if randNum == 0:
             if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
                 if (self.checkOccupied(env, (self.position[0] + 1, self.position[1], self.position[2]))):
                     self.position[0] += 1
-                    #print('move Current position: ', self.position)
-                    self.setEdgeDetected(env)
+                    if(self.checkEdgeDetected(env) and random.uniform(0,1) < probability):
+                        self.edgeDetected = True
+                    elif self.checkEdgeDetected(env) and random.uniform(0,1)>probability:
+                        self.position[0]-=1
+                        randNum=randint(0,3)
+                        self.moveAnt(randNum,env)
+                    print('move Current position: ', self.position)
             else:
                 randNum = randint(0, 3)
                 self.moveAnt(randNum,env)
@@ -150,8 +153,13 @@ class ant(object):
             if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
                 if (self.checkOccupied(env, (self.position[0] - 1, self.position[1], self.position[2]))):
                     self.position[0] -= 1
-                    #print('move Current position: ', self.position)
-                    self.setEdgeDetected(env)
+                    if (self.checkEdgeDetected(env) and random.uniform(0, 1) < probability):
+                        self.edgeDetected = True
+                    elif self.checkEdgeDetected(env) and random.uniform(0, 1) > probability:
+                        self.position[0] += 1
+                        randNum = randint(0, 3)
+                        self.moveAnt(randNum, env)
+                    print('move Current position: ', self.position)
             else:
                 randNum = randint(0, 3)
                 self.moveAnt(randNum, env)
@@ -160,8 +168,13 @@ class ant(object):
             if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
                 if (self.checkOccupied(env, (self.position[0], self.position[1] + 1, self.position[2]))):
                     self.position[1] += 1
-                    #print('move Current position: ', self.position)
-                    self.setEdgeDetected(env)
+                    if (self.checkEdgeDetected(env) and random.uniform(0, 1) < probability):
+                        self.edgeDetected = True
+                    elif self.checkEdgeDetected(env) and random.uniform(0, 1) > probability:
+                        self.position[1] -= 1
+                        randNum = randint(0, 3)
+                        self.moveAnt(randNum, env)
+                    print('move Current position: ', self.position)
             else:
                 randNum = randint(0, 3)
                 self.moveAnt(randNum, env)
@@ -170,8 +183,13 @@ class ant(object):
             if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
                 if (self.checkOccupied(env, (self.position[0], self.position[1] - 1, self.position[2]))):
                     self.position[0] -= 1
-                    #print('move Current position: ', self.position)
-                    self.setEdgeDetected(env)
+                    if (self.checkEdgeDetected(env) and random.uniform(0, 1) < probability):
+                        self.edgeDetected = True
+                    elif self.checkEdgeDetected(env) and random.uniform(0, 1) > probability:
+                        self.position[1] += 1
+                        randNum = randint(0, 3)
+                        self.moveAnt(randNum, env)
+                    print('move Current position: ', self.position)
             else:
                 randNum = randint(0, 3)
                 self.moveAnt(randNum, env)

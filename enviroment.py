@@ -8,6 +8,7 @@ import numpy as np
 import os
 import math
 from ant import ant
+#from singlestepant import ant
 import csv
 #import random !!!
 import copy
@@ -123,14 +124,32 @@ class environment(object):
             oldindex = np.copy(antindex.getPosition())
             self.env[tuple(antindex.getPosition())] = 0
             antindex.checkAttach(self.env, 1)
+            #antindex.performstep(self.env, 0.5 , 1)
             newindex = antindex.getPosition()
             if antindex.attached:
                 self.env[tuple(newindex)] = 2
             else:
                 self.env[tuple(newindex)] = 1
             if any(newindex != oldindex):
-                print('antmoved!')
-        return ;
+                print('antmoved!', oldindex, newindex)
+        return;
+
+    def moveOneAnt(self, index = 0):
+        print('moving ant number ', index)
+
+        oldindex = np.copy(self.ants[index].getPosition())
+        self.env[tuple(self.ants[index].getPosition())] = 0
+
+        #self.ants[index].performstep(self.env, 1, 1)
+        self.ants[index].checkAttach(self.env, 1)
+        newindex = self.ants[index].getPosition()
+        if self.ants[index].attached:
+            self.env[tuple(newindex)] = 2
+        else:
+            self.env[tuple(newindex)] = 1
+        if any(newindex != oldindex):
+            print('antmoved!', oldindex, newindex)
+        return;
 
     def loadAnts(self, filename='antconfig.csv'):
         """

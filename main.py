@@ -12,10 +12,12 @@ env = environment([10,10,10])
 
 env.setAnts(50, 'cube')
 env.showAnts()
-env.performStep()
+env.moveOneAnt(49)
+#for i in range(10):
+#    env.performStep()
 env.showAnts()
-env.saveAnts()
-env.loadAnts()
+#env.saveAnts()
+#env.loadAnts()
 
 
 
