@@ -7,7 +7,7 @@ Created on Thu Jan 11 13:18:31 2018
 import numpy as np
 import os
 import math
-import ant
+from ant import ant
 import csv
 #import random !!!
 
@@ -62,8 +62,8 @@ class environment(object):
             countx = county = 0
             #print('Sidelength is: ',sidelength)
 
-            for ant in range(number):
-                self.ants.append(ant.__init__(startpoint, ant))
+            for antindex in range(number):
+                self.ants.append(ant(startpoint, antindex))
                 self.env[tuple(startpoint)] = 2
                 #print('Ant set at ', startpoint)
                 if countx < sidelength:
@@ -93,6 +93,15 @@ class environment(object):
     def showAnts(self):
         for i in range(self.dimensions[2]):
             print(np.matrix(self.env[:,:,i]))
+
+        return;
+
+    def performStep(self):
+        print('Performing a step!')
+        for antindex in self.ants:
+            antindex.checkAttach(self.env, 1)
+            print('\n')
+        return ;
 
     def loadAnts(self, filename='antconfig.csv'):
         """

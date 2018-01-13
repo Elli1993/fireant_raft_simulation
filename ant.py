@@ -24,46 +24,39 @@ class ant(object):
             position: int array giving the initial position of the ant.
             """
         self.position = position
-        self.attached = False
+        self.attached = True
         self.index = index
         self.edgeDetected = False
 
         return;
 
-    def randomwalk(self, env):
+    def findFriends(self, env):
+        """ looks in x and y direction. if it finds other ants returns true if not returns false
         """
-        One step of a non-attached ant. It walks randomly and connects to the raft if it reaches an edge with a
-        certain probability.
-            """
-        x = randint(0, 3)
-        moveAnt(self, x, env)
-        if (self.edgeDetected):
-            findAttachment(self, env)
-        else:
-            randomwalk(self, env)
-
-        return;
-
-    def checkAttach(self, env, probability):
-        """
-        One step of an attached ant. It checks if it should let go and start a random walk.
-        """
-        index = [0, 1]
         var = [-1, 1]
-        friends = 0
-        if (self.attached):
-            if (env[self.position[0]][self.position[1]][self.position[2] + 1] == 0):
-                for v in var:
-                    if (env[self.position[0] + var][self.position[1]][self.position[2]] != 0):
-                        friends += 1
-                    if (env[self.position[0]][self.position[1] + var][self.position[2]] != 0):
-                        friends += 1
 
-                if friends > 3 and random.uniform(0, 1) < probability:
-                    # start randomwalk by doing a first step up and then to one side
-                    self.position[2] += 1
-                    x = randint(0, 3)
-                    moveAnt(self, x, env)
+        for v in var:
+            if (env[self.position[0] + var][self.position[1]][self.position[2]] != 0 or
+                        env[self.position[0]][self.position[1] + var][self.position[2]] != 0):
+                return True
+
+        return ;
+
+    def findAttachment(self, env):
+        """ moves downwards until finds a place to attach itself and attaches itself there
+        """
+        self.position[2] -= 1
+        hasFriend = self.findFriends
+        while env[self.position[0]][self.position[1]][self.position[2] - 1] == 0 and hasFriend:
+            self.position[2] -= 1
+            if (self.findFriends(self, env) == False):
+                hasFriend = False
+
+        if hasFriend == False:
+            self.position[2] += 1
+            self.attached
+        elif env[self.position[0]][self.position[1]][self.position[2] - 1] == 0:
+            self.attached
 
         return;
 
@@ -92,9 +85,9 @@ class ant(object):
                 randNum = randint(0, 3)
 
         elif randNum == 2:
-            if (env[self.position[0]][self.position[1] + 1][self.position[2]] == 0):
+            if (env[self.position[0], self.position[1] + 1, self.position[2]] == 0):
                 self.position[1] += 1
-                if (env[self.position[0]][self.position[1]][self.position[2] - 1] == 0):
+                if (env[self.position[0], self.position[1], self.position[2] - 1] == 0):
                     self.edgeDetected = True
             else:
                 randNum = randint(0, 3)
@@ -109,32 +102,42 @@ class ant(object):
 
         return;
 
-    def findAttachment(self, env):
-        """ moves downwards until finds a place to attach itself and attaches itself there
-        """
-        self.position[2] -= 1
-        hasFriend = findFriends
-        while env[self.position[0]][self.position[1]][self.position[2] - 1] == 0 and hasFriend:
-            self.position[2] -= 1
-            if (findFriends(self, env) == False):
-                hasFriend = False
 
-        if hasFriend == False:
-            self.position[2] += 1
-            self.attached
-        elif env[self.position[0]][self.position[1]][self.position[2] - 1] == 0:
-            self.attached
+    def checkAttach(self, env, probability):
+        """
+        One step of an attached ant. It checks if it should let go and start a random walk.
+        """
+        index = [0, 1]
+        var = [-1, 1]
+        friends = 0
+        if (self.attached):
+            if (env[self.position[0], self.position[1], self.position[2] + 1] == 0):
+                for v in var:
+                    if (env[self.position[0] + v, self.position[1], self.position[2]] != 0):
+                        friends += 1
+                    if (env[self.position[0], self.position[1] + v, self.position[2]] != 0):
+                        friends += 1
+
+                if friends < 3 and random.uniform(0, 1) < probability:
+                    # start randomwalk by doing a first step up and then to one side
+                    self.position[2] += 1
+                    x = randint(0, 3)
+                    self.moveAnt(x, env)
 
         return;
 
-    def findFriends(self, env):
-        """ looks in x and y direction. if it finds other ants returns true if not returns false
-        """
-        var = [-1, 1]
 
-        for v in var:
-            if (env[self.position[0] + var][self.position[1]][self.position[2]] != 0 or
-                        env[self.position[0]][self.position[1] + var][self.position[2]] != 0):
-                return True
+    def randomwalk(self, env):
+        """
+        One step of a non-attached ant. It walks randomly and connects to the raft if it reaches an edge with a
+        certain probability.
+        """
+        x = randint(0, 3)
+        self.moveAnt(self, x, env)
+        if (self.edgeDetected):
+            self.findAttachment(self, env)
+        else:
+            self.randomwalk(self, env)
+            return;
 
         return False
