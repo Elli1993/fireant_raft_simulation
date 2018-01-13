@@ -30,78 +30,20 @@ class ant(object):
 
         return;
 
-    def findFriends(self, env):
-        """ looks in x and y direction. if it finds other ants returns true if not returns false
+    def randomwalk(self, env):
         """
-        var = [-1, 1]
+        One step of a non-attached ant. It walks randomly and connects to the raft if it reaches an edge with a
+        certain probability.
+            """
 
-        for v in var:
-            if (env[self.position[0] + var][self.position[1]][self.position[2]] != 0 or
-                        env[self.position[0]][self.position[1] + var][self.position[2]] != 0):
-                return True
-
-        return ;
-
-    def findAttachment(self, env):
-        """ moves downwards until finds a place to attach itself and attaches itself there
-        """
-        self.position[2] -= 1
-        hasFriend = self.findFriends
-        while env[self.position[0]][self.position[1]][self.position[2] - 1] == 0 and hasFriend:
-            self.position[2] -= 1
-            if (self.findFriends(self, env) == False):
-                hasFriend = False
-
-        if hasFriend == False:
-            self.position[2] += 1
-            self.attached
-        elif env[self.position[0]][self.position[1]][self.position[2] - 1] == 0:
-            self.attached
-
-        return;
-
-    def moveAnt(self, randNum, env):
-        """
-        moves ant in the direction the randNum indicates, 0:x+1, 1:x-1, 2:y+1, 3: y-1, if position is free
-        if doesn't have an ant below -> edgeDetected=True
-        """
-        # TODO: check if position is free
-
-        if randNum == 0:
-            if (env[self.position[0] + 1][self.position[1]][self.position[2]] == 0):
-                self.position[0] += 1
-                if (env[self.position[0]][self.position[1]][self.position[2] - 1] == 0):
-                    self.edgeDetected = True
-            else:
-                randNum = randint(0, 3)
-
-
-        elif randNum == 1:
-            if (env[self.position[0] - 1][self.position[1]][self.position[2]] == 0):
-                self.position[0] -= 1
-                if (env[self.position[0]][self.position[1]][self.position[2] - 1] == 0):
-                    self.edgeDetected = True
-            else:
-                randNum = randint(0, 3)
-
-        elif randNum == 2:
-            if (env[self.position[0], self.position[1] + 1, self.position[2]] == 0):
-                self.position[1] += 1
-                if (env[self.position[0], self.position[1], self.position[2] - 1] == 0):
-                    self.edgeDetected = True
-            else:
-                randNum = randint(0, 3)
-
+        if (self.edgeDetected):
+            self.findAttachment(env)
         else:
-            if (env[self.position[0]][self.position[1] - 1][self.position[2]] == 0):
-                self.position[1] -= 1
-                if (env[self.position[0]][self.position[1]][self.position[2] - 1] == 0):
-                    self.edgeDetected = True
-            else:
-                randNum = randint(0, 3)
+            x = randint(0, 3)
+            self.moveAnt(x, env)
+            self.randomwalk(env)
 
         return;
-
 
     def checkAttach(self, env, probability):
         """
@@ -110,6 +52,7 @@ class ant(object):
         index = [0, 1]
         var = [-1, 1]
         friends = 0
+        #print( 'starting pos ', self.position)
         if (self.attached):
             if (env[self.position[0], self.position[1], self.position[2] + 1] == 0):
                 for v in var:
@@ -117,27 +60,125 @@ class ant(object):
                         friends += 1
                     if (env[self.position[0], self.position[1] + v, self.position[2]] != 0):
                         friends += 1
-
+                #print("friends:", friends)
                 if friends < 3 and random.uniform(0, 1) < probability:
                     # start randomwalk by doing a first step up and then to one side
+                    print('walking starts')
                     self.position[2] += 1
+                    #print('Current position: ', self.position)
                     x = randint(0, 3)
                     self.moveAnt(x, env)
+                    self.randomwalk(env)
+        #print('end pos ', self.position)
+        return;
+
+    def getPosition(self):
+        x = self.position
+        return x;
+
+    def findAttachment(self, env):
+        """ moves downwards until finds a place to attach itself and attaches itself there
+        """
+        self.position[2] -= 1
+        #print('find attach Current position: ', self.position)
+        hasFriend = self.findFriends(env)
+        while env[self.position[0], self.position[1], self.position[2] - 1] == 0 and hasFriend:
+            self.position[2] -= 1
+            #print('find attach Current position: ', self.position)
+            if (self.findFriends(env) == False):
+                hasFriend = False
+
+        if hasFriend == False:
+            self.position[2] += 1
+            #print('find attach Current position: ', self.position)
+            self.attached = True
+            print('find attach ant attached again')
+        elif env[self.position[0], self.position[1], self.position[2] - 1] == 0:
+            self.attached = True
+            print('find attach ant attached again')
+        return;
+
+    def findFriends(self, env):
+        """ looks in x and y direction. if it finds other ants returns true if not returns false
+        """
+        var = [-1, 1]
+        print('looking for friends')
+        for v in var:
+            if (env[self.position[0] + v, self.position[1], self.position[2]] != 0 or env[
+                self.position[0], self.position[1] + v, self.position[2]] != 0):
+                return True
+
+        return False
+
+    def checkboundaries(self, env, position=[0, 0, 0]):
+        if all(np.asarray(position) < env.shape):
+            return True;
+        else:
+            return False;
+        return;
+
+    def checkOccupied(self, env, position=[0, 0, 0]):
+        if env[position[0], position[1], position[2]] != 0:
+            return False;
+        return True;
+
+    def setEdgeDetected(self, env):
+        if (env[self.position[0], self.position[1], self.position[2] - 1] == 0):
+            self.edgeDetected = True;
+        else:
+            self.edgeDetected = False;
+        return;
+
+    def moveAnt(self, randNum, env):
+        """
+        moves ant in the direction the randNum indicates, 0:x+1, 1:x-1, 2:y+1, 3: y-1, if position is free
+        if doesn't have an ant below -> edgeDetected=True
+        """
+        print('movingAnt')
+        if randNum == 0:
+            if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
+                if (self.checkOccupied(env, (self.position[0] + 1, self.position[1], self.position[2]))):
+                    self.position[0] += 1
+                    #print('move Current position: ', self.position)
+                    self.setEdgeDetected(env)
+            else:
+                randNum = randint(0, 3)
+                self.moveAnt(randNum,env)
+
+
+        elif randNum == 1:
+            if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
+                if (self.checkOccupied(env, (self.position[0] - 1, self.position[1], self.position[2]))):
+                    self.position[0] -= 1
+                    #print('move Current position: ', self.position)
+                    self.setEdgeDetected(env)
+            else:
+                randNum = randint(0, 3)
+                self.moveAnt(randNum, env)
+
+        elif randNum == 2:
+            if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
+                if (self.checkOccupied(env, (self.position[0], self.position[1] + 1, self.position[2]))):
+                    self.position[1] += 1
+                    #print('move Current position: ', self.position)
+                    self.setEdgeDetected(env)
+            else:
+                randNum = randint(0, 3)
+                self.moveAnt(randNum, env)
+
+        else:
+            if (self.checkboundaries(env, (self.position[0] + 1, self.position[1], self.position[2]))):
+                if (self.checkOccupied(env, (self.position[0], self.position[1] - 1, self.position[2]))):
+                    self.position[0] -= 1
+                    #print('move Current position: ', self.position)
+                    self.setEdgeDetected(env)
+            else:
+                randNum = randint(0, 3)
+                self.moveAnt(randNum, env)
 
         return;
 
 
-    def randomwalk(self, env):
-        """
-        One step of a non-attached ant. It walks randomly and connects to the raft if it reaches an edge with a
-        certain probability.
-        """
-        x = randint(0, 3)
-        self.moveAnt(self, x, env)
-        if (self.edgeDetected):
-            self.findAttachment(self, env)
-        else:
-            self.randomwalk(self, env)
-            return;
 
-        return False
+
+

@@ -10,6 +10,9 @@ import math
 from ant import ant
 import csv
 #import random !!!
+import copy
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
 
 class environment(object):
     '''
@@ -63,7 +66,8 @@ class environment(object):
             #print('Sidelength is: ',sidelength)
 
             for antindex in range(number):
-                self.ants.append(ant(startpoint, antindex))
+                currentant = ant(startpoint, antindex)
+                self.ants.append(copy.deepcopy(currentant))
                 self.env[tuple(startpoint)] = 2
                 #print('Ant set at ', startpoint)
                 if countx < sidelength:
@@ -90,22 +94,48 @@ class environment(object):
 
         return;
 
-    def showAnts(self):
+    def showAntsBin(self):
         for i in range(self.dimensions[2]):
             print(np.matrix(self.env[:,:,i]))
 
         return;
 
+    def showAnts(self):
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')
+        xdata = np.argwhere(self.env == 2)[:,0]
+        ydata = np.argwhere(self.env == 2)[:,1]
+        zdata = np.argwhere(self.env == 2)[:,2]
+        plt.ylabel('y')
+        plt.xlabel('x')
+        ax.scatter3D(xdata, ydata, zdata, c='b', s=500);
+        xdatamove = np.argwhere(self.env == 1)[:, 0]
+        ydatamove = np.argwhere(self.env == 1)[:, 1]
+        zdatamove = np.argwhere(self.env == 1)[:, 2]
+        ax.scatter3D(xdatamove, ydatamove, zdatamove, c='r', s=500);
+        return;
+
     def performStep(self):
         print('Performing a step!')
+        oldindex = np.zeros(3)
         for antindex in self.ants:
+            #print(antindex)
+            oldindex = np.copy(antindex.getPosition())
+            self.env[tuple(antindex.getPosition())] = 0
             antindex.checkAttach(self.env, 1)
-            print('\n')
+            newindex = antindex.getPosition()
+            if antindex.attached:
+                self.env[tuple(newindex)] = 2
+            else:
+                self.env[tuple(newindex)] = 1
+            if any(newindex != oldindex):
+                print('antmoved!')
         return ;
 
     def loadAnts(self, filename='antconfig.csv'):
         """
-        Args: 
+        Loading ants from a csv file. Reading size from the commented first line.
+        Args:
             filename: file handle to load ants from a file
         """
         print('Loading data from ', filename, '.')
@@ -116,12 +146,8 @@ class environment(object):
         y = int(text[1][1:])
         z = int(text[2][1:-1])
 
-
-
-
         # Read the array from disk
         new_data = np.loadtxt(filename, delimiter=',')
-        #print (new_data)
 
         # However, going back to 3D is easy if we know the
         # original shape of the array
@@ -131,6 +157,7 @@ class environment(object):
 
     def saveAnts(self, filename='antconfig.csv'):
         """
+        Saving ant configuration to a csv. Env shape is saved in a commented out first line.
         Args: 
             filename: file handle to save ants in a file
         """
