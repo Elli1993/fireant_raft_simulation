@@ -7,8 +7,8 @@ Created on Thu Jan 11 13:18:31 2018
 import numpy as np
 import os
 import math
-#from ant import ant
-from singlestepant import ant
+from ant import ant
+#from singlestepant import ant
 import csv
 #import random !!!
 import copy
@@ -144,8 +144,8 @@ class environment(object):
             #print(antindex)
             oldindex = np.copy(antindex.getPosition())
             self.env[tuple(antindex.getPosition())] = 0
-            #antindex.checkAttach(self.env, 1)
-            antindex.performstep(self.env, 0.5 , 1)
+            antindex.checkAttach(self.env, 1)
+            #antindex.performstep(self.env, 0.5 , 1)
             newindex = antindex.getPosition()
             if antindex.attached:
                 self.env[tuple(newindex)] = 2
@@ -161,8 +161,8 @@ class environment(object):
         oldindex = np.copy(self.ants[index].getPosition())
         self.env[tuple(self.ants[index].getPosition())] = 0
 
-        self.ants[index].performstep(self.env, 1, 1)
-        #self.ants[index].checkAttach(self.env, 1)
+        #self.ants[index].performstep(self.env, 1, 1)
+        self.ants[index].checkAttach(self.env, 1)
         newindex = self.ants[index].getPosition()
         if self.env[tuple(newindex)] != 0:
             print('WAAAAARNNIIINNNNGGG!!!!!')
