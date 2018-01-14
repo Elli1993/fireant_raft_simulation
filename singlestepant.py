@@ -47,7 +47,7 @@ class ant(object):
                         env[self.position[0],self.position[1] + v,self.position[2]] != 0):
                 return True
 
-        return ;
+        return False;
 
     def findAttachment(self, env , x = 0):
         """
@@ -57,29 +57,58 @@ class ant(object):
             x: int between 0 and 3 indicating the direction of the edge.
         """
         #perform step to get over edge
+        #TODO sometimes it still gets here even though the position is taken
+        #TODO ant continues to go down even if it does no longer have friends
         if x == 0:
-            self.position[0] += 1
+            if self.checkOccupied(env, [self.position[0] + 1, self.position[1], self.position[2]]):
+                self.position[0] += 1
+            else:
+                self.attached = True
+                return;
         elif x == 1:
-            self.position[0] -= 1
+            if self.checkOccupied(env, [self.position[0] - 1, self.position[1], self.position[2]]):
+                self.position[0] -= 1
+            else:
+                self.attached = True
+                return;
         elif x ==2:
-            self.position[1] += 1
+            if self.checkOccupied(env, [self.position[0], self.position[1] +1 , self.position[2]]):
+                self.position[1] += 1
+            else:
+                self.attached = True
+                return;
         else:
-            self.position[1] -= 1
-
+            if self.checkOccupied(env, [self.position[0], self.position[1] - 1 , self.position[2]]):
+                self.position[1] -= 1
+            else:
+                self.attached = True
+                return;
         #move downward
-        self.position[2] -= 1
+        if self.checkboundaries(env, [self.position[0], self.position[1], self.position[2]-1]):
+            if self.checkOccupied(env, [self.position[0], self.position[1], self.position[2]-1]):
+                self.position[2] -= 1
+            else:
+                self.attached = True
+                return;
         hasFriend = self.findFriends(env)
         while (env[self.position[0], self.position[1], self.position[2] - 1] == 0
                 and hasFriend):
-            self.position[2] -= 1
+            if self.checkboundaries(env, [self.position[0], self.position[1], self.position[2] - 1]):
+                self.position[2] -= 1
+            else:
+                print('somehow at the bottom!!!!!')
+                self.attached = True
+                return ;
             if (self.findFriends(env) == False):
                 hasFriend = False
 
         if hasFriend == False:
-            self.position[2] += 1
-            self.attached = True
+            if self.checkOccupied(env,[self.position[0], self.position[1], self.position[2] +1]):
+                self.position[2] += 1
+                self.attached = True
         #env[self.position[0], self.position[1], self.position[2] - 1] == 0:
         self.attached = True
+
 
         return;
 
@@ -97,38 +126,38 @@ class ant(object):
         #print('movingAnt ', randNum)
         moved = False
         if randNum == 0:
-            if (self.checkboundaries(env, [self.position[0] + 1, self.position[1], self.position[2]])
-                and self.checkOccupied(env, [self.position[0] + 1, self.position[1], self.position[2]])):
-                if self.checkEdgeDetected(env, [self.position[0] + 1, self.position[1], self.position[2] - 1] ):
-                    self.edgeDetected=True
-                    return moved;
-                else:
-                    self.position[0] += 1
-                    moved = True
-
-        elif randNum == 1:
-            if (self.checkboundaries(env, [self.position[0] - 1, self.position[1], self.position[2]])
-            and self.checkOccupied(env, [self.position[0] - 1, self.position[1], self.position[2]])):
-                if self.checkEdgeDetected(env, [self.position[0] - 1, self.position[1], self.position[2] - 1]):
-                    self.edgeDetected=True
-                    return moved;
-                else:
-                    self.position[0] -= 1
-                    moved = True
-
-        elif randNum == 2:
-            if (self.checkboundaries(env, [self.position[0], self.position[1] +1, self.position[2]])
-                and self.checkOccupied(env, [self.position[0], self.position[1] + 1, self.position[2]])):
-                    if self.checkEdgeDetected(env, [self.position[0], self.position[1] +1, self.position[2] - 1]):
+            if (self.checkboundaries(env, [self.position[0] + 1, self.position[1], self.position[2]])):
+                if self.checkOccupied(env, [self.position[0] + 1, self.position[1], self.position[2]]):
+                    if self.checkEdgeDetected(env, [self.position[0] + 1, self.position[1], self.position[2] - 1] ):
                         self.edgeDetected=True
                         return moved;
                     else:
-                        self.position[1] += 1
+                        self.position[0] += 1
                         moved = True
 
+        elif randNum == 1:
+            if (self.checkboundaries(env, [self.position[0] - 1, self.position[1], self.position[2]])):
+                if self.checkOccupied(env, [self.position[0] - 1, self.position[1], self.position[2]]):
+                    if self.checkEdgeDetected(env, [self.position[0] - 1, self.position[1], self.position[2] - 1]):
+                        self.edgeDetected=True
+                        return moved;
+                    else:
+                        self.position[0] -= 1
+                        moved = True
+
+        elif randNum == 2:
+            if (self.checkboundaries(env, [self.position[0], self.position[1] +1, self.position[2]])):
+                if self.checkOccupied(env, [self.position[0], self.position[1] + 1, self.position[2]]):
+                        if self.checkEdgeDetected(env, [self.position[0], self.position[1] +1, self.position[2] - 1]):
+                            self.edgeDetected=True
+                            return moved;
+                        else:
+                            self.position[1] += 1
+                            moved = True
+
         else:
-            if (self.checkboundaries(env, [self.position[0], self.position[1] - 1, self.position[2]])
-                and self.checkOccupied(env, [self.position[0], self.position[1] - 1, self.position[2]])):
+            if (self.checkboundaries(env, [self.position[0], self.position[1] - 1, self.position[2]])):
+                if self.checkOccupied(env, [self.position[0], self.position[1] - 1, self.position[2]]):
                     if self.checkEdgeDetected(env, [self.position[0], self.position[1] - 1, self.position[2] - 1]):
                         self.edgeDetected=True
                         return moved;
@@ -150,6 +179,7 @@ class ant(object):
         friends = 0
         counter = 0
         movement = False
+        flag = False
         if (self.attached):
             if (self.checkboundaries(env, [self.position[0], self.position[1], self.position[2] + 1]) and
                         env[self.position[0], self.position[1], self.position[2] + 1] == 0):
@@ -164,17 +194,24 @@ class ant(object):
                     #print('Ant released at ', self.position)
                     self.attached = False
                     if friends > 1:
-                        self.position[2] += 1
-                        #print('Ant moved up to ', self.position)
-
-                    while movement==False and counter < 4:
+                        if self.checkOccupied(env,[self.position[0], self.position[1], self.position[2] +1]):
+                            self.position[2] += 1
+                            flag = True
+                            #print('Ant moved up to ', self.position)
+                    #print(self.position)
+                    while movement == False and counter < 4:
                         counter += 1
                         x = randint(0, 3)
                         movement = self.moveAnt(x, env)
                         #print('Ant made step to ', self.position)
-                    if counter >=4:
-                        self.position[2] -= 1
+                    #print(self.position)
+                    #print(movement)
+                    if counter >=4 and movement == False:
+                        if flag:
+                                #print('inflag')
+                                self.position[2] -= 1
                         self.attached = True
+                        #print('ant could not move')
                     #print('Ant stopped at ', self.position)
         return;
 

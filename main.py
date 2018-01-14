@@ -6,19 +6,23 @@ Created on Thu Jan 11 13:18:33 2018
 
 from ant import ant
 from enviroment import environment
+import numpy as np
 
-
-env = environment([10,10,10])
+bound = 20
+zbound = 10
+env = environment([bound,bound,zbound])
 
 env.setAnts(50, 'cube')
 env.showAnts(save=True, index = [0,0], show=False)
 #env.moveOneAnt(49)
-for i in range(1):
+for i in range(10):
     for index in range(50):
         bool = env.moveOneAnt(index)
         if bool:
             env.showAnts(save=True, index= [i,index], show=False)
 
+numberOfAnts = np.count_nonzero(env.env)
+print('Number of ants at end ', numberOfAnts)
 env.createGif('move.gif')
 #env.saveAnts()
 #env.loadAnts()

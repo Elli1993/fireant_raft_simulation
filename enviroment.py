@@ -118,9 +118,9 @@ class environment(object):
             plt.ioff()
         fig = plt.figure()
         ax = plt.axes(projection='3d')
-        plt.ylim((0,10))
-        plt.xlim((0,10))
-        ax.set_zlim(0,10)
+        plt.ylim((0,self.env.shape[1]))
+        plt.xlim((0,self.env.shape[0]))
+        ax.set_zlim(0,self.env.shape[2])
         xdata = np.argwhere(self.env == 2)[:,0]
         ydata = np.argwhere(self.env == 2)[:,1]
         zdata = np.argwhere(self.env == 2)[:,2]
@@ -134,6 +134,7 @@ class environment(object):
         if save:
             plt.savefig('ants' + str(index) + '.png')
             self.pictures.append('ants' + str(index) + '.png')
+        plt.close(fig)
         return;
 
     def performStep(self):
@@ -163,6 +164,10 @@ class environment(object):
         self.ants[index].performstep(self.env, 1, 1)
         #self.ants[index].checkAttach(self.env, 1)
         newindex = self.ants[index].getPosition()
+        if self.env[tuple(newindex)] != 0:
+            print('WAAAAARNNIIINNNNGGG!!!!!')
+            print(self.env[tuple(newindex)])
+            print(self.ants[index].attached)
         if self.ants[index].attached:
             self.env[tuple(newindex)] = 2
         else:
