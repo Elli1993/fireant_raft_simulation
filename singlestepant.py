@@ -69,7 +69,8 @@ class ant(object):
         #move downward
         self.position[2] -= 1
         hasFriend = self.findFriends(env)
-        while env[self.position[0], self.position[1], self.position[2] - 1] == 0 and hasFriend:
+        while (env[self.position[0], self.position[1], self.position[2] - 1] == 0
+                and hasFriend):
             self.position[2] -= 1
             if (self.findFriends(env) == False):
                 hasFriend = False
@@ -77,8 +78,8 @@ class ant(object):
         if hasFriend == False:
             self.position[2] += 1
             self.attached = True
-        elif env[self.position[0], self.position[1], self.position[2] - 1] == 0:
-            self.attached = True
+        #env[self.position[0], self.position[1], self.position[2] - 1] == 0:
+        self.attached = True
 
         return;
 
@@ -93,7 +94,7 @@ class ant(object):
             Bool: True if an actual movement was performed, False otherwise.
         """
 
-        print('movingAnt ', randNum)
+        #print('movingAnt ', randNum)
         moved = False
         if randNum == 0:
             if (self.checkboundaries(env, [self.position[0] + 1, self.position[1], self.position[2]])
@@ -160,7 +161,7 @@ class ant(object):
 
                 if friends < 3 and random.uniform(0, 1) < probability:
                     # start randomwalk by doing a first step up and then to one side
-                    print('Ant released at ', self.position)
+                    #print('Ant released at ', self.position)
                     self.attached = False
                     if friends > 1:
                         self.position[2] += 1
@@ -174,7 +175,7 @@ class ant(object):
                     if counter >=4:
                         self.position[2] -= 1
                         self.attached = True
-                    print('Ant stopped at ', self.position)
+                    #print('Ant stopped at ', self.position)
         return;
 
 

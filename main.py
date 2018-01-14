@@ -11,11 +11,15 @@ from enviroment import environment
 env = environment([10,10,10])
 
 env.setAnts(50, 'cube')
-env.showAnts()
-env.moveOneAnt(49)
-#for i in range(10):
-#    env.performStep()
-env.showAnts()
+env.showAnts(save=True, index = [0,0], show=False)
+#env.moveOneAnt(49)
+for i in range(1):
+    for index in range(50):
+        bool = env.moveOneAnt(index)
+        if bool:
+            env.showAnts(save=True, index= [i,index], show=False)
+
+env.createGif('move.gif')
 #env.saveAnts()
 #env.loadAnts()
 

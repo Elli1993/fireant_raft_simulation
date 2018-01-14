@@ -7,13 +7,14 @@ Created on Thu Jan 11 13:18:31 2018
 import numpy as np
 import os
 import math
-from ant import ant
-#from singlestepant import ant
+#from ant import ant
+from singlestepant import ant
 import csv
 #import random !!!
 import copy
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
+import imageio
 
 class environment(object):
     '''
@@ -35,11 +36,13 @@ class environment(object):
         self.numUpdates = 0
         self.numAnts = 0
         self.ants = []
+        self.pictures = []
 
         return;
     
     def setAnts(self, number = 200, config = 'cube'):
         """
+        Setting the ants up in a starting configuration.
         Args: 
             number: int, number of ants
             config: string, specifying the initial configuration of ants: random, circle, cube....
@@ -96,14 +99,28 @@ class environment(object):
         return;
 
     def showAntsBin(self):
+        """
+            Showing the current ant configuration in the console.
+        """
         for i in range(self.dimensions[2]):
             print(np.matrix(self.env[:,:,i]))
 
         return;
 
-    def showAnts(self):
+    def showAnts(self, save = True, index = [1,1], show=False):
+        """
+            Args:
+                save: bool, if the picture should be saved
+                index: array, included in the name of the picture to be saved
+                show: bool, if the picture should be shown during execution
+        """
+        if not show:
+            plt.ioff()
         fig = plt.figure()
         ax = plt.axes(projection='3d')
+        plt.ylim((0,10))
+        plt.xlim((0,10))
+        ax.set_zlim(0,10)
         xdata = np.argwhere(self.env == 2)[:,0]
         ydata = np.argwhere(self.env == 2)[:,1]
         zdata = np.argwhere(self.env == 2)[:,2]
@@ -114,6 +131,9 @@ class environment(object):
         ydatamove = np.argwhere(self.env == 1)[:, 1]
         zdatamove = np.argwhere(self.env == 1)[:, 2]
         ax.scatter3D(xdatamove, ydatamove, zdatamove, c='r', s=500);
+        if save:
+            plt.savefig('ants' + str(index) + '.png')
+            self.pictures.append('ants' + str(index) + '.png')
         return;
 
     def performStep(self):
@@ -123,8 +143,8 @@ class environment(object):
             #print(antindex)
             oldindex = np.copy(antindex.getPosition())
             self.env[tuple(antindex.getPosition())] = 0
-            antindex.checkAttach(self.env, 1)
-            #antindex.performstep(self.env, 0.5 , 1)
+            #antindex.checkAttach(self.env, 1)
+            antindex.performstep(self.env, 0.5 , 1)
             newindex = antindex.getPosition()
             if antindex.attached:
                 self.env[tuple(newindex)] = 2
@@ -135,13 +155,13 @@ class environment(object):
         return;
 
     def moveOneAnt(self, index = 0):
-        print('moving ant number ', index)
+        #print('moving ant number ', index)
 
         oldindex = np.copy(self.ants[index].getPosition())
         self.env[tuple(self.ants[index].getPosition())] = 0
 
-        #self.ants[index].performstep(self.env, 1, 1)
-        self.ants[index].checkAttach(self.env, 1)
+        self.ants[index].performstep(self.env, 1, 1)
+        #self.ants[index].checkAttach(self.env, 1)
         newindex = self.ants[index].getPosition()
         if self.ants[index].attached:
             self.env[tuple(newindex)] = 2
@@ -149,7 +169,8 @@ class environment(object):
             self.env[tuple(newindex)] = 1
         if any(newindex != oldindex):
             print('antmoved!', oldindex, newindex)
-        return;
+            return True;
+        return False;
 
     def loadAnts(self, filename='antconfig.csv'):
         """
@@ -197,4 +218,16 @@ class environment(object):
                 #outfile.write('# New layer\n')
 
         print('Data saved sucessfully to ', filename, '.')
-        return; 
+        return;
+
+    def createGif(self, moviename='movie.gif'):
+        """
+        Saving the created pictures as a gif.
+        Args:
+            moviename: file handle to save the gif
+        """
+        images = []
+        for filename in self.pictures:
+            images.append(imageio.imread(filename))
+        imageio.mimsave(moviename, images)
+        return;
