@@ -7,7 +7,7 @@ Created on Thu Jan 11 13:18:31 2018
 import numpy as np
 import os
 import math
-# from ant import ant
+#from ant import ant
 from singlestepant import ant
 import csv
 # import random !!!
@@ -38,6 +38,7 @@ class environment(object):
         self.ants = []
         self.pictures = []
         self.antsMoved = []
+        self.singlestepant = True
 
         return;
 
@@ -152,32 +153,37 @@ class environment(object):
         return;
 
     def performStep(self, releaseprob = 0.5, attachprob = 1):
-        print('Performing a step!')
+        #print('Performing a step!')
         oldindex = np.zeros(3)
         for antindex in self.ants:
             # print(antindex)
             oldindex = np.copy(antindex.getPosition())
             self.env[tuple(antindex.getPosition())] = 0
-            # antindex.checkAttach(self.env, 1)
-            antindex.performstep(self.env, releaseprob, attachprob)
+
+            if self.singlestepant:
+                antindex.performstep(self.env, releaseprob, attachprob)
+            else:
+                antindex.checkAttach(self.env, 1)
             newindex = antindex.getPosition()
             if antindex.attached:
                 self.env[tuple(newindex)] = 2
             else:
                 self.env[tuple(newindex)] = 1
             if any(newindex != oldindex):
-                print('antmoved!', oldindex, newindex)
+                #print('antmoved!', oldindex, newindex)
                 self.antsMoved.append(copy.deepcopy(antindex))
         return;
 
     def moveOneAnt(self, index=0):
-        # print('moving ant number ', index)
+        #print('moving ant number ', index)
 
         oldindex = np.copy(self.ants[index].getPosition())
         self.env[tuple(self.ants[index].getPosition())] = 0
 
-        self.ants[index].performstep(self.env, 1, 1)
-        # self.ants[index].checkAttach(self.env, 1)
+        if self.singlestepant:
+            self.ants[index].performstep(self.env, 1, 1)
+        else:
+            self.ants[index].checkAttach(self.env, 1)
         newindex = self.ants[index].getPosition()
         #if self.env[tuple(newindex)] != 0:
             #print('WAAAAARNNIIINNNNGGG!!!!!')
@@ -188,7 +194,7 @@ class environment(object):
         else:
             self.env[tuple(newindex)] = 1
         if any(newindex != oldindex):
-            print('antmoved!', oldindex, newindex)
+            #print('antmoved!', oldindex, newindex)
             self.antsMoved.append(copy.deepcopy(self.ants[index]))
             # print(self.antsMoved)
             return True;

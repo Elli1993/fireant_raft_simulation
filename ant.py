@@ -57,7 +57,7 @@ class ant(object):
         movement=False
         counter =0
         flag = False
-        print( 'starting pos ', self.position)
+        #print( 'starting pos ', self.position)
         if (self.attached):
             if (env[self.position[0], self.position[1], self.position[2] + 1] == 0):
                 for v in var:
@@ -68,7 +68,7 @@ class ant(object):
                 #print("friends:", friends)
                 if friends < 3 and random.uniform(0, 1) < probAttach:
                     # start randomwalk by doing a first step up and then to one side
-                    print('walking starts')
+                    #print('walking starts')
                     if friends > 1:
                         self.position[2] +=1
                         flag=True
@@ -95,7 +95,7 @@ class ant(object):
                     if movement == True:
                         self.randomwalk(env, 0, maxSteps, probAttach)
 
-        print('end pos ', self.position)
+        #print('end pos ', self.position)
         return;
 
     def getPosition(self):

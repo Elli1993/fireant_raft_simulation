@@ -194,10 +194,13 @@ class ant(object):
                     #print('Ant released at ', self.position)
                     self.attached = False
                     if friends > 1:
-                        if self.checkOccupied(env,[self.position[0], self.position[1], self.position[2] +1]):
+                        if env[self.position[0], self.position[1], self.position[2] +1]==0:
                             self.position[2] += 1
                             flag = True
                             #print('Ant moved up to ', self.position)
+                        else:
+                            self.attached=True
+                            return ;
                     #print(self.position)
                     while movement == False and counter < 4:
                         counter += 1
@@ -206,7 +209,7 @@ class ant(object):
                         #print('Ant made step to ', self.position)
                     #print(self.position)
                     #print(movement)
-                    if counter >=4 and movement == False:
+                    if movement == False:
                         if flag:
                                 #print('inflag')
                                 self.position[2] -= 1
@@ -224,12 +227,15 @@ class ant(object):
                 env: 3D int array showing the discrete environment.
                 attachprob: double between 0-1 probability that a random walk ant attaches to an edge
         """
-        x = randint(0, 3)
-        self.moveAnt(x, env)
-        if (self.edgeDetected and random.uniform(0, 1) < attachprob):
-            self.findAttachment(env, x)
+        if env[self.position[0], self.position[1], self.position[2]+1] == 0:
+            x = randint(0, 3)
+            self.moveAnt(x, env)
+            if (self.edgeDetected and random.uniform(0, 1) < attachprob):
+                self.findAttachment(env, x)
+            else:
+                self.edgeDetected = False
         else:
-            self.edgeDetected = False
+            self.attached=True
         return;
 
 
